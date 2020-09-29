@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet"href="index.css">
+    <div class="loader">
+      <h2>Loading....</h2>
+    </div>  
+        <title>Github Profile Finder</title>
+    </head>
+    <body>
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+     <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script> 
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.7.2/prop-types.min.js"></script> 
+
+        <div id="root"></div>
+        <script>
+        //</script><script type = "text/babel">
+
+const SingleUser = ({
+name,
+bio,
+avatar,
+location,
+followers,
+following,
+}) =>{
+
+//const [see,setSee] = React.useState(false);
+
+const hideBox =()=>{
+    
+};
+/*
+   return (
+      <div className="userCard">
+        <div className="header_user"><span className="fa fa-close"></span></div>
+            <div className="pic">                
+            </div>
+            <h2 className="name">Coder</h2>   
+            <p className="bio">NoBio</p>
+            <p className="location">Ludhiana</p>
+            <div className="follower">
+                <button className="followers">11 Followers <i className="fa fa-users"></i></button>
+                <button className="following">9 Following <i className="fa fa-users"></i></button>
+            </div>
+       <button className="visit_profile">View Profile   <i className="fa fa-arrow-right"></i></button>            
+        </div>
+    )
+*/    
+}
+
+const Alert =()=>{    
+   return(
+         <div className="toast">
+        <p><span style={{fontSize:"20px"}} className="fa fa-info-circle"></span><span>Enter Something</span></p>
+         </div> 
+  )    
+}
+const Loader =()=>{
+    return (
+         <div className="loader-body"> 
+          <div className ="li-l-par">        
+           <div className="line1 pic"></div>
+           <div className="line1"></div>
+           <div className="line1"></div>
+           <div className="line2"></div>
+          </div>
+        </div>       
+    )
+}
+            
+const UserCard =({name,img,link})=>{    
+ return(
+   <div className="user">
+     <img src ={img} alt=""/>
+     <br/><hr/>       
+     <p>{name}</p>
+     <a href={link}><button>View Profile    <span className="fa fa-arrow-right"></span></button></a>
+   </div>
+    )    
+}
+const Users =({loading,users,hasUser})=>{ 
+ return loading?<Loader />:hasUser?(
+      <div className="UserCon">
+       {users.map((user,k)=>           
+            <UserCard
+             key={k}
+             name={user.login}
+             img={user.avatar_url}
+             link={user.html_url}
+            />            
+        )}            
+      </div>
+     ):(
+        <div className="userCon">
+           <p>No User Found...</p>
+        </div>
+     )
+}
+class SearchBar extends React.Component{
+   state={
+        text:"",
+        showAlert:false,
+   }
+       setTxtValue=(e)=>this.setState({text:e.target.value});   
+   searchUsers = () =>{
+       if(this.state.text){
+                              this.props.searchUser(this.state.text);
+ this.setState({text:"",showAlert:false})
+       }
+       else{
+          this.setState({showAlert:true})
+          
+          setTimeout(()=>this.setState({showAlert:false}),1500)
+       }
+   }
+   render(){
+      return(
+          <div className="searchCon">
+            <input type="text" value={this.state.text} placeholder="Search User..." onChange={this.setTxtValue}/>
+            <button onClick={this.searchUsers}>Search</button>
+      {this.state.showAlert&&<Alert />}                      
+          </div>
+       )
+   }
+}
+const Navbar =(props)=>{    
+    return(
+     <div className="header">
+           <p><span className="fa fa-github"></span> Github Profile Finder </p>
+           {props.hasUser ? <button onClick={props.clrUsers}>Clear</button>:""}           
+     </div>
+    )
+}
+class App extends React.Component{
+   state={
+       users : [],
+       loading:true,
+       hasUser : false,
+   }
+   componentDidMount(){   
+this.setState({loading:true,hasUser:false});
+                                                                            fetch("https://cors-anywhere.herokuapp.com/https://api.github.com/users?client_id=7f2f05541ad894a31576&client_secret=d2e49ac75fc0ad94cf59bb8245129ae3bd55ad83",
+    {
+       type: "POST",
+       dataType: "json",
+       contentType: "application/json",
+       // set the request header authorization to the bearer token that is generated
+      headers: {
+         "X-Requested-With": "XMLHttpRequest"
+      },                                                               
+                                               })
+.then(res=>{
+    return res.json();
+    }).then(k=>{
+    this.setState({users:k,loading:false,hasUser:true});
+    })
+        
+   }
+   
+   
+searchSingleUser=(e)=>{ 
+   this.setState({loading:true,hasUser:false})
+ 
+    
+}   
+   
+   searchUser=(e)=>{      
+this.setState({loading:true,hasUser:false})
+         fetch(`https://cors-anywhere.herokuapp.com/https://api.github.com/search/users?q=${e}&client_id=7f2f05541ad894a31576&client_secret=d2e49ac75fc0ad94cf59bb8245129ae3bd55ad83`,{
+       type: "POST",
+       dataType: "json",
+       contentType: "application/json",
+       // set the request header authorization to the bearer token that is generated
+       headers: {
+         "X-Requested-With": "XMLHttpRequest"
+         },      
+         })
+.then(res=>{
+    return res.json();
+    }).then(k=>{
+   // console.log(JSON.stringify(k))
+    this.setState({users:k.items,loading:false,hasUser:true})
+    })      
+   }
+   clrUsers=(e)=>this.setState({users:[],loading:false,hasUser:false});
+   render(){
+        return (
+            <div>
+            <Navbar
+            clrUsers={this.clrUsers}
+            hasUser = {this.state.hasUser}
+             />        
+            <SearchBar 
+            searchUser={this.searchUser}
+            />
+            <Users
+             users={this.state.users}
+             loading={this.state.loading}
+             hasUser={this.state.hasUser}
+            />
+            </div>
+        )
+    }
+}
+document.getElementsByClassName("loader")[0].style.display = "none";
+ReactDOM.render(
+    <App />,
+    document.getElementById("root")
+)
+//</script>
+        </script>
+    </body>
+</html>
